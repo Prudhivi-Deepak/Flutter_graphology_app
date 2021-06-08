@@ -14,15 +14,15 @@ Now After Downloading these three
 
 Then After creating it 
 
-Open lib folder and upload all .dart files in that folder by deleting the previous files in lib folder.
+Open lib folder and upload all **.dart files **in that folder by deleting the previous files in lib folder.
 
-Upload hello-world-cba35-f184eebe9189.json and all model files in the working directory.
+Upload **hello-world-cba35-f184eebe9189.json** and all model files in the working directory.
 
-Replace AndroidManifest.xml android\app\src\main directory with AndroidManifest.xml given in this git hub.
+Replace **AndroidManifest.xml** **android\app\src\main** directory with AndroidManifest.xml given in this git hub.
 
-Upload google-services.json android\app directory.
+Upload **google-services.json** **android\app** directory.
 
-Replace  pubspec.yaml file with given pubspec.yaml in github.
+Replace ** pubspec.yaml** file with given **pubspec.yaml** in github.
 
 **Now open the terminal all run fluuter app by typing command**
 
