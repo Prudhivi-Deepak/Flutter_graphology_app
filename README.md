@@ -1,14 +1,16 @@
 # Flutter_graphology_app
 
-Install Android Studio and flutter and vscode
+**Install Android Studio and flutter and vscode**
 
 Android Studio : https://developer.android.com/studio
+
 vscode Download : https://code.visualstudio.com/download
+
 Flutter Download : https://flutter.dev/docs/get-started/install/windows
 
 Now After Downloading these three
 
-Open Vscode or Android Studio to Create new Flutter Project
+**Open Vscode or Android Studio to Create new Flutter Project**
 
 Then After creating it 
 Open lib folder and upload all .dart files in that folder by deleting the previous files in lib folder.
@@ -17,7 +19,7 @@ Replace AndroidManifest.xml android\app\src\main directory with AndroidManifest.
 Upload google-services.json android\app directory.
 Replace  pubspec.yaml file with given pubspec.yaml in github.
 
-Now open the terminal all run fluuter app by typing command
+**Now open the terminal all run fluuter app by typing command**
 
  "flutter run"
  
