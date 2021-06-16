@@ -1,0 +1,13 @@
+flask
+gunicorn
+flask_mysqldb
+firebase_admin 
+opencv-python-headless
+matplotlib
+numpy
+pandas
+pickle-mixin
+werkzeug
+sklearn
+requests
+urllib3
