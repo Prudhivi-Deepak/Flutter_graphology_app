@@ -1,5 +1,6 @@
 
 # Flutter_graphology_app
+Dataset of images : https://www.kaggle.com/tejasreddy/iam-handwriting-top50?select=data_subset
 
 Install Android Studio and flutter and vscode
 
