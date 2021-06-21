@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script> 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+    <link href="/static/home.css" rel="stylesheet" >
+    <title>Document</title>
+</head>
+<body>
+    {%if flag!=1 %}
+    <div class="dropdown" >
+        <img src="/static/img/back.jpg" id="logo">
+        <div class="dropdown-content">
+            <a href="/">Logout</a>
+        </div>
+    </div>
+    <h1>{{msg}}</h1>
+    <h1>Search By Email</h1>
+    <div class="container">
+        <div id="login-row" class="row justify-content-center align-items-rigth">
+            <div id="login-column" class="col-md-6">
+                <div id="login-box" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+
+                    <form action="/admin22" method="post">
+                        <div class="form-group">
+                            <label for="email" class="text-info">Email:</label><br>
+                            <input type="email" name="email" id="email" class="form-control" required>
+                        </div>
+
+                        <button class="dropbtn" type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>  
+
+    {%endif%}
+    {%if flag==1%}
+    <div class="dropdown" >
+        <img src="/static/img/back.jpg" id="logo">
+        <div class="dropdown-content">
+            <a style="text-decoration:none" href="/home">Home</a>
+            <a style="text-decoration:none" href="/main1">Image</a>
+            <a style="text-decoration:none" href="/canvas">Digital</a>
+            <a style="text-decoration:none" href="/logout">Logout</a>
+        </div>
+    </div>
+    <!-- #id , email , input , output1 , output2 , info. -->
+        {%for i in emails%}
+            <form action="/history1/{{i}}" method="post">
+                <button  class="dropbtn" type="submit">{{i}}</button>
+            </form>
+            <br>
+        {%endfor%}
+    {%endif%}
+
+</body>
+</html>

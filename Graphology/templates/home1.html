@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+  <link href="/static/home.css" rel="stylesheet" >
+  
+</head>
+<body>
+    <div class="dropdown" >
+        <img src="/static/img/back.jpg" id="logo">
+        <div class="dropdown-content">
+          <a href="/login1" method='POST'>Login</a>
+          <a href="/signup1">Sign UP</a>
+        </div>
+    </div>
+    <div id="login">
+      <br>
+        <h1 class="text-center text-black pt-7" >Personality Detection</h1>
+        <br><br><br><br><br><br><br><br><br>
+        <h2 class="text-center   text-white pt-5" >
+          <form action="/login1" class="inline">
+            <button class="dropbtn" id="button1" >LOGIN</button>
+          </form>
+          <br>
+          <form action="/signup1" class="inline">
+            <button class="dropbtn" id="button1" >SIGN UP</button>
+          </form>
+          <br>
+          <form action="/admin" class="inline">
+            <button class="dropbtn" id="button1" >Admin Login</button>
+          </form>
+
+        </h2>
+      </div>
+</body>
+</html>

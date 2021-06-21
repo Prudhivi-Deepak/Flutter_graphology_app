@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/canvas.css" >
+    <link rel="shortcut icon" href="#">
+</head>
+<body>
+    <div class="dropdown" >
+        <img src="/static/img/back.jpg" id="logo">
+        <!--  -->
+        <div class="dropdown-content">
+          <a style="text-decoration:none" href="/home">Home</a>
+          <a style="text-decoration:none" href="/main1">Image</a>
+          <a style="text-decoration:none" href="/history">History</a>
+          <a style="text-decoration:none" href="/logout">Log out</a>
+        </div>
+    </div>
+    <form action="/canvas1" name = "form1" method="POST" enctype = "multipart/form-data">
+        <canvas id="canvas" ></canvas>
+
+        <input type="color" id="colordone" required>
+        <input type="number" step="0.1" id="linewidthdone" required>
+
+        <input type="hidden" id="my_hidden" name="image1">
+        <button class="dropbtn" type="button" id ="save">Save the image</button>
+        <button class="dropbtn" type="submit" >Predict now</button>
+        <img src="/static/img/test.jpg" id="image">
+        <script src="/static/canvas.js"></script>
+    </form>
+</body>
+</html>

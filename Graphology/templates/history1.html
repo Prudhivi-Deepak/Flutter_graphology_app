@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script> 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+    <link href="/static/home.css" rel="stylesheet" >
+    <title>Document</title>
+</head>
+<body>
+    {%if flag==1%}
+    <div class="dropdown" >
+        <img src="/static/img/back.jpg" id="logo">
+        <div class="dropdown-content">
+            <a style="text-decoration:none" href="/home">Home</a>
+            <a style="text-decoration:none" href="/main1">Image</a>
+            <a style="text-decoration:none" href="/canvas">Digital</a>
+            <a style="text-decoration:none" href="/history">History</a>
+            <a style="text-decoration:none" href="/logout">Logout</a>
+        </div>
+    </div>
+    <!-- #id , email , input , output1 , output2 , info. -->
+        {%for i in length1%}
+            <form action="/history2/{{dupdate[i]}}" method="post">
+                <button  class="dropbtn" type="submit">{{dates[i]}}</button>
+            </form>
+            <br>
+        {%endfor%}
+    {%endif%}
+
+</body>
+</html>

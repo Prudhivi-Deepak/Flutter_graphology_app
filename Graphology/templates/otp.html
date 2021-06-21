@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script> 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+    <link href="/static/home.css" rel="stylesheet" >
+    <title>Document</title>
+</head>
+<body>
+    <div id="login">
+        <div class="container">
+            <div id="login-row" class="row justify-content-center align-items-rigth">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                        <form action="/otpverify" id="login-form" class="form" method="post">
+                            {{msg}}
+                            <h3 class="text-center text-info">Email OTP Confirmation</h3>
+                            <div class="form-group">
+                                <label for="password" class="text-info">Confirm OTP:</label><br>
+                                <input type="password" name="password" id="password" class="form-control" required>
+                            </div>
+                
+                            <div class="form-group">
+                                <input class="dropbtn" type="submit" name="submit" class="btn btn-info btn-md" value="Register">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

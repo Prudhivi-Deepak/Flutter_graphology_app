@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/home.css"> 
+    <title>Document</title>
+</head>
+<body>
+    <div class="dropdown" >
+        <img src="/static/img/back.jpg" id="logo">
+        <!-- <button class="dropbtn">Menu</button> -->
+        <div class="dropdown-content">
+          <a href="/main1">Image</a>
+          <a href="/history">History</a>
+          <a href="/canvas">Digital</a>
+          <a href="/logout">Log out</a>
+
+        </div>
+    </div>
+    <form action="/main1" method="post">
+        <h1>If U had the image of Hand written page Press Below button</h1>
+        <button class="dropbtn" type="submit" >Predict</button>
+    </form>
+    <form action="/canvas" method="post">
+        <h1>If U dont have downloaded image Press Below Button to write with digital pen and download image</h1>
+        <button  class="dropbtn" type="submit">Digital Pen</button>
+    </form>
+</body>
+</html>

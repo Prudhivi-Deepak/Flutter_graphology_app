@@ -1,0 +1,13 @@
+flask 
+sqlalchemy 
+requests
+opencv-python-headless
+matplotlib
+numpy
+pandas
+pickle-mixin
+gunicorn
+werkzeug
+sendgrid
+sklearn
+authlib
