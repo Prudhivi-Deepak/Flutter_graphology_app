@@ -1,32 +1,37 @@
-# Flutter_graphology_app
+# Graphology
 
-**Install Android Studio and flutter and vscode**
+In this project i have used 
 
-Android Studio : https://developer.android.com/studio
+1. **Open CV** for image processing
 
-vscode Download : https://code.visualstudio.com/download
+2. **Machine learning model svm** to detect features of the hand written images after preprocessing 
 
-Flutter Download : https://flutter.dev/docs/get-started/install/windows
+3. I got higher accuracy when i used linear kernel in svm 
 
-Now After Downloading these three
+  The accuracies are shown below
 
-**Open Vscode or Android Studio to Create new Flutter Project**
+    Accuracy for Predicting  **Emotion** :  0.9989795918367347
 
-Then After creating it 
+    Accuracy for Predicting  **mental** :  0.823469387755102
 
-Open lib folder and upload all **.dart files **in that folder by deleting the previous files in lib folder.
+    Accuracy for Predicting  **modesty** :  0.8112244897959183
 
-Upload **hello-world-cba35-f184eebe9189.json** and all model files in the working directory.
+    Accuracy for Predicting  **discipline** :  0.9989795918367347
 
-Replace **AndroidManifest.xml** **android\app\src\main** directory with AndroidManifest.xml given in this git hub.
+    Accuracy for Predicting  **communication** :  0.8816326530612245
 
-Upload **google-services.json** **android\app** directory.
+    Accuracy for Predicting  **social** :  0.9908163265306122
 
-Replace ** pubspec.yaml** file with given **pubspec.yaml** in github.
+4. And then i have use **Flask , Html and CSS** to built a Web app
 
-**Now open the terminal all run fluuter app by typing command**
+5. Used **Heroku** to deploy the website
 
- "flutter run"
- 
- You can run the flutter app by creating the android emulator in android studio itself or using any external device using usb debugging.
- 
+6. If u want to fork the git hub then fork it or Download it 
+
+    then open app.py file in vscode or any editor with **python** installed
+
+    then open terminal and type the command **"pip install -r requirements"** to install all requirements in your python environment.
+
+    To Run the application use command **"python app.py"**
+
+    then open Your **localhost:5000** to see test the application
