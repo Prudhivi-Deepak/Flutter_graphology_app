@@ -1,30 +1,9 @@
-0-sad
-1-disturbed
-2-happy
-3-excited,
-
-0-irresponsible
-1-don't respect
-2-Shows respect
-3-Responsible,
-
-0-Unconfident
-1-don't belives
-2-belives
-3-very Confident,
-
-0-selfish and unregular
-1-Undisciplined
-2-Good attitude
-3-disciplined,
-
-0-lack of communication
-1-bad softskills
-2-good softskills
-3-good communication,
-
-0-bad social acts
-1-good social acts
+0-sad 1-disturbed 2-happy 3-excited,
+0-irresponsible 1-don't respect 2-Shows respect 3-Responsible,
+0-Unconfident 1-don't belives 2-belives 3-very Confident,
+0-selfish and unregular 1-Undisciplined 2-Good attitude 3-disciplined,
+0-lack of communication 1-bad softskills 2-good softskills 3-good communication,
+0-bad social acts 1-good social acts
 
 Emotion,mental,modesty,discipline,c2c,social,image_label
 3,2,2,1,3,1,a01-000u-s00-00.png
