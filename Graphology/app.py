@@ -1,7 +1,12 @@
 
 try:
-    from flask import Flask, redirect, url_for, session,render_template,request
     from datetime import timedelta
+    from flask import Flask, render_template, flash, redirect, request, url_for, send_file, session
+    import datetime
+    import os
+    from cloudant.client import Cloudant
+    from cloudant.error import CloudantException
+    from cloudant.result import Result, ResultByKey
     from authlib.integrations.flask_client import OAuth
     import json
     from werkzeug.utils import secure_filename
@@ -17,12 +22,11 @@ try:
     import pickle
     import os
     import random
-    from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail
+    # from sendgrid import SendGridAPIClient
+    # from sendgrid.helpers.mail import Mail
     from datetime import date,datetime
     import urllib
     import hashlib
-    import sklearn
 except Exception as e:
     print("Some Modules are Missing : {} ".format(e))
 
@@ -33,6 +37,11 @@ app = Flask(__name__)
 # ====================Change me  =======================================
 global client_id
 global client_secret
+global client
+
+client = Cloudant.iam("e9a1474d-2a68-4b11-b60c-a60c87c061a9-bluemix","oUFFwB9qB-SghbaQbaj7y7TSu7N4yS3mWrDdyYHxtjJn",connect=True)
+client.connect()
+
 
 client_id = "778520672114-0nnem7bqng6l8u0o1vs08onno2k8hngd.apps.googleusercontent.com"
 client_secret = "v8kyQb4VhO5ZqMFAfsctwjF4"
@@ -109,36 +118,19 @@ def hello_world():
 @app.route('/history2/<dateurl>',methods=["POST","GET"])
 def histroy2(dateurl):
     msg=""
-    engine = create_engine('sqlite:///database2.db',echo=True)
-    conn  =engine.connect()
-    res11 = conn.execute("SELECT * FROM data WHERE dateurl =?",(dateurl))
-    alldata = res11.fetchall()
-    if(len(alldata)==0):
-        return  render_template("admin1.html",flag=0,msg=str(date)+" Date Haven't used Our website")
-    newlist=[]
-    dates=[]
-    list1=[]
-    for data1 in range(len(alldata)):
-        print(list(alldata[data1][5].split(",")))
-        list1.append( list(alldata[data1][5].split(",")) )
-    for i1,i2 in zip(alldata,list1):
-        print("---------------------------------------------",i2[0][3:-3])
-        print("---------------------------------------------",i2[1][3:-3])
-        print("---------------------------------------------",i2[2][3:-3])
-        print("---------------------------------------------",i2[3][3:-3])
-        print("---------------------------------------------",i2[4][3:-3])
-        print("---------------------------------------------",i2[5][3:-3])
-        i2[0]=i2[0][3:-3]
-        i2[1]=i2[1][3:-3]
-        i2[2]=i2[2][3:-3]
-        i2[3]=i2[3][3:-3]
-        i2[4]=i2[4][3:-3]
-        i2[5]=i2[5][3:-3]
-        newlist.append([i1,i2])
-    print("---------------------------------------------------------------------------------------------------------")
-    print(dates)
-    # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
-    return render_template("history3.html",flag=1,alldata=newlist,dates=dates,length1=range(len(newlist[0][1])))
+    if "data" in client:
+        db = client["data"]
+    else:
+        db = client.create_database("data")
+
+    result = Result(db.all_docs, include_docs=True)
+    # print(result,list(result))
+
+    for i in list(result):
+        if i['doc']['dateurl']==dateurl:
+            i1=i['doc']
+    print(i1)
+    return render_template("history3.html",flag=1,alldata=i1)
 
 
 
@@ -147,42 +139,21 @@ def histroy2(dateurl):
 @app.route('/history1/<email11>',methods=["POST","GET"])
 def histroy1(email11):
     msg=""
-    engine = create_engine('sqlite:///database2.db',echo=True)
-    conn  =engine.connect()
-    res11 = conn.execute("SELECT * FROM data WHERE email =?",(email11))
-    alldata = res11.fetchall()
-    if(len(alldata)==0):
-        return  render_template("admin1.html",flag=0,msg=str(session["email"])+" Email Address Haven't used Our website for  image")
-    newlist=[]
+
+    if "data" in client:
+        db = client["data"]
+    else:
+        db = client.create_database("data")
+
+    result = Result(db.all_docs, include_docs=True)
+    # print(result,list(result))
     dates=[]
     dupdate=[]
-    list1=[]
-    for data1 in range(len(alldata)):
-        print(list(alldata[data1][5].split(",")))
-        list1.append( list(alldata[data1][5].split(",")) )
-    for i1,i2 in zip(alldata,list1):
-        print("---------------------------------------------",i2[0][3:-3])
-        print("---------------------------------------------",i2[1][3:-3])
-        print("---------------------------------------------",i2[2][3:-3])
-        print("---------------------------------------------",i2[3][3:-3])
-        print("---------------------------------------------",i2[4][3:-3])
-        print("---------------------------------------------",i2[5][3:-3])
-        i2[0]=i2[0][3:-3]
-        i2[1]=i2[1][3:-3]
-        i2[2]=i2[2][3:-3]
-        i2[3]=i2[3][3:-3]
-        i2[4]=i2[4][3:-3]
-        i2[5]=i2[5][3:-3]
-        newlist.append([i1,i2])
-    print("---------------------------------------------------------------------------------------------------------")
-    for i in newlist:
-        if(i[0][1] not in dates):
-            dates.append(i[0][6])
-            dupdate.append(i[0][7])
-        print(i)
-    print(dates)
-    # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
-    return render_template("history1.html",flag=1,alldata=newlist,dates=dates,dupdate=dupdate,length1=range(len(dates)))
+    for i in list(result):
+        if i['doc']['email']==email11 and  i['doc']['date'] not in dates:
+            dates.append(i['doc']['date'])
+            dupdate.append(i['doc']['dateurl'])
+    return render_template("history1.html",flag=1,dates=dates,dupdate=dupdate,length1=range(len(dates)))
 
 
 
@@ -191,40 +162,17 @@ def histroy1(email11):
 def histroy():
     flag,user,email = isLoggedIN()
     msg=""
-    engine = create_engine('sqlite:///database2.db',echo=True)
-    conn  =engine.connect()
-    res11 = conn.execute("SELECT * FROM data WHERE email =?",(email))
-    alldata = res11.fetchall()
-    if(len(alldata)==0):
-        return  render_template("admin1.html",flag=0,msg=str(email)+" Email Address Haven't used Our website for  image")
-    newlist=[]
+    if "data" in client:
+        db = client["data"]
+    else:
+        db = client.create_database("data")
+
+    result = Result(db.all_docs, include_docs=True)
     emails=[]
-    list1=[]
-    for data1 in range(len(alldata)):
-        print(list(alldata[data1][5].split(",")))
-        list1.append( list(alldata[data1][5].split(",")) )
-    for i1,i2 in zip(alldata,list1):
-        print("---------------------------------------------",i2[0][3:-3])
-        print("---------------------------------------------",i2[1][3:-3])
-        print("---------------------------------------------",i2[2][3:-3])
-        print("---------------------------------------------",i2[3][3:-3])
-        print("---------------------------------------------",i2[4][3:-3])
-        print("---------------------------------------------",i2[5][3:-3])
-        i2[0]=i2[0][3:-3]
-        i2[1]=i2[1][3:-3]
-        i2[2]=i2[2][3:-3]
-        i2[3]=i2[3][3:-3]
-        i2[4]=i2[4][3:-3]
-        i2[5]=i2[5][3:-3]
-        newlist.append([i1,i2])
-    print("---------------------------------------------------------------------------------------------------------")
-    for i in newlist:
-        if(i[0][1] not in emails):
-            emails.append(i[0][1])
-        print(i)
-    print(emails)
-    # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
-    return render_template("history.html",flag=1,alldata=newlist,emails=emails,length1=range(len(newlist[0][1])))
+    for i in list(result):
+        if i['doc']['email'] not in emails:
+            emails.append(i['doc']['email'])
+    return render_template("history.html",flag=1,emails=emails)
 
 #========================main================================================================================================================
 @app.route('/main1',methods=['POST','GET'])
@@ -254,8 +202,8 @@ def canvas1():
         my_path = os.path.dirname(__file__)
         filename1= "img/inputnew"+str(time.time())+".png"
         new_name_i = my_path+'/static/'+filename1
-        # print(new_name_i)
-        # print("Image-----------------------------------------------------------",image)
+        print(new_name_i)
+        print("Image-----------------------------------------------------------")
         response = urllib.request.urlopen(image)
         response1 = urllib.request.urlopen(image)
 
@@ -294,10 +242,6 @@ def canvas1():
                 if(ang<0):
                     ang = 180-ang
             MYANGLE=MYANGLE+ang
-        #     box = cv2.boxPoints(rect)
-        #     box = np.int0(box)
-        #     cv2.drawContours(image1,[box],0,(0,0,255),15)
-        #     cv2.rectangle(image1,(x,y),(x+w,y+h),(255,0,0),10)
         baseline_angles_list.append((MYANGLE/count))
     #     print(baseline_angles_list,len(baseline_angles_list))
         
@@ -317,10 +261,6 @@ def canvas1():
             if(row[0].any()==0):
                 count1=count1+1
         top_margin.append(count1)
-    #     print(top_margin,len(top_margin))
-        
-
-
         # 3.word spacing
         word_spacing_ratio=[]
         written_spacing_ratio=[]
@@ -348,8 +288,6 @@ def canvas1():
 
         filtered = cv2.bilateralFilter(inverted,15,75,75)
         ret , thresh4 = cv2.threshold(filtered,150,255,cv2.THRESH_TOZERO)
-    #     if(j%50==0):
-    #         print(j)
         total_intensity = 0 
         pixel_count = 0 
         for x in range(h):
@@ -363,13 +301,10 @@ def canvas1():
         pen_pressure.append(average_intensity)
     #     print(len(pen_pressure))
 
-
         # 5.Slant letter
 
 
         slant_letters_angle=[]
-
-        # image5 = cv2.imread('./data_subset/a01-000u-s00-01.png',1)
         image5 = cv2.bilateralFilter(image,9,50,50)
         image5 = cv2.cvtColor(image5 , cv2.COLOR_BGR2GRAY)
         h,w  = image5.shape[:2] 
@@ -547,22 +482,14 @@ def canvas1():
         new_name2 = "img/plot2"+str(time.time())+".png"
         plt.savefig(my_path+'/static/'+new_name2,dpi=300,bbox_inches='tight')
         plt.clf()
+        try:
+            if "data" in client:
+                db = client["data"]
+            else:
+                db = client.create_database("data")
+        except:
+            print("exception")
 
-        engine2 = create_engine('sqlite:///database2.db',echo=True)
-        meta2 = MetaData()
-        data = Table(
-            'data',meta2,
-            Column('id',Integer,primary_key=True),
-            Column('email',String),
-            Column('input',String),
-            Column('output1',String),
-            Column('output2',String),
-            Column('info',String),
-            Column('date',String),
-            Column('dateurl',String)
-        )
-        meta2.create_all(engine2)
-        conn2  =engine2.connect()
 
         today = date.today()
         d1 = today.strftime("%d/%m/%Y")
@@ -576,8 +503,18 @@ def canvas1():
         my_path=os.path.dirname(__file__)
         os.remove(os.path.join(my_path,"input.png"))
 
-        insert11 = data.insert().values(email = email,input=str(filename1),output1=str(new_name1),output2=str(new_name2),info=str(info),date=d1+" "+d2,dateurl=d11+d22)
-        result1 = conn2.execute(insert11)
+        input_data = {"email":email,
+            "input": str(filename1),
+            "output1":str(new_name1),
+            "output2":str(new_name2),
+            "info":"".join(info),
+            "date":d1+" "+d2,
+            "dateurl":d11+d22
+        }
+
+        print(input_data)
+
+        db.create_document(input_data)
     else:
         return "<h1>Your Session maybe expired Please signin again<h1>"
 
@@ -623,10 +560,6 @@ def main():
                 if(ang<0):
                     ang = 180-ang
             MYANGLE=MYANGLE+ang
-        #     box = cv2.boxPoints(rect)
-        #     box = np.int0(box)
-        #     cv2.drawContours(image1,[box],0,(0,0,255),15)
-        #     cv2.rectangle(image1,(x,y),(x+w,y+h),(255,0,0),10)
         baseline_angles_list.append((MYANGLE/count))
     #     print(baseline_angles_list,len(baseline_angles_list))
         
@@ -663,7 +596,6 @@ def main():
                 space+=1
         word_spacing_ratio.append(float(space/image3.shape[0]))
         written_spacing_ratio.append((image3.shape[0]-space)/image3.shape[0])
-    #     print(len(word_spacing_ratio),len(written_spacing_ratio))
 
         # 4.Pen pressure
 
@@ -724,10 +656,6 @@ def main():
                 if(ang2<0):
                     ang2 = 180-ang2
             MYANGLE2=MYANGLE2+ang2
-        #     box = cv2.boxPoints(rect)
-        #     box = np.int0(box)
-        #     cv2.drawContours(i,[box],0,(0,0,255),15)
-        #     cv2.rectangle(i,(x,y),(x+w,y+h),(255,0,0),10)
         if(count2==0):
             count2=1
         slant_letters_angle.append((MYANGLE2/count2))
@@ -856,18 +784,6 @@ def main():
         from matplotlib import pyplot as plt
         from matplotlib import pyplot as plt1
         import os
-        # my_path=os.path.dirname(__file__)+"\static\img"
-        # os.remove(os.path.join(my_path,file))
-        # try:
-        #     print("try-----------------------------------------------------try",my_path)
-        #     for file in os.listdir(my_path):
-        #         print(file)
-        #         if file.endswith('.png'):
-        #             os.remove(os.path.join(my_path,file))
-        #             print(file)
-        # except:
-        #     pass
-
         my_path=os.path.dirname(__file__)
         image_input = cv2.imread(session["filename"],1)
         plt.axis("off")
@@ -878,7 +794,6 @@ def main():
 
 
         x1=res
-        # print("x1-----------------------------------------------------------------------------------------",x1)
         y1=[4, 4, 4, 4, 4, 2]
         names=["Emotion","mental","modesty","discipline","c2c","social"]
 
@@ -886,7 +801,6 @@ def main():
         plt.scatter(names,x1)
         my_path=os.path.dirname(__file__)
         new_name1 = "img/plot1"+str(time.time())+".png"
-        # print("new_name1 :",new_name1,time.time())
         plt.savefig(my_path+'/static/'+new_name1,dpi=300,bbox_inches='tight')
         plt.clf()
         
@@ -898,25 +812,15 @@ def main():
         plt1.scatter(names,y1)
         plt1.plot(names,y1)
         new_name2 = "img/plot2"+str(time.time())+".png"
-        # print("new_name2 :",new_name2,time.time())
         plt.savefig(my_path+'/static/'+new_name2,dpi=300,bbox_inches='tight')
         plt.clf()
-
-        engine2 = create_engine('sqlite:///database2.db',echo=True)
-        meta2 = MetaData()
-        data = Table(
-            'data',meta2,
-            Column('id',Integer,primary_key=True),
-            Column('email',String),
-            Column('input',String),
-            Column('output1',String),
-            Column('output2',String),
-            Column('info',String),
-            Column('date',String),
-            Column('dateurl',String)
-        )
-        meta2.create_all(engine2)
-        conn2  =engine2.connect()
+        try:
+            if "data" in client:
+                db = client["data"]
+            else:
+                db = client.create_database("data")
+        except:
+            print("exception")
 
         today = date.today()
         d1 = today.strftime("%d/%m/%Y")
@@ -928,9 +832,16 @@ def main():
         my_path=os.path.dirname(__file__)
         os.remove(os.path.join(my_path,session["filename"]))
 
-        insert11 = data.insert().values(email = email,input=str(new_name),output1=str(new_name1),output2=str(new_name2),info=str(info),date=d1+" "+d2,dateurl=d11+d22)
-        result1 = conn2.execute(insert11)
-
+        input_data = {"email":email,
+            "input": str(new_name),
+            "output1":str(new_name1),
+            "output2":str(new_name2),
+            "info":"".join(info),
+            "date":d1+" "+d2,
+            "dateurl":d11+d22
+        }
+        print(input_data)
+        db.create_document(input_data)
     return render_template("index.html",i=1,plot1=new_name1,plot2=new_name2,info=info)
 
 #================================Admin login=================================================================================================
@@ -943,127 +854,55 @@ def admin():
 @app.route('/adminh3/<dateurl>',methods=["POST","GET"])
 def adminh3(dateurl):
     msg=""
-    engine = create_engine('sqlite:///database2.db',echo=True)
-    conn  =engine.connect()
-    res11 = conn.execute("SELECT * FROM data WHERE dateurl =?",(dateurl))
-    alldata = res11.fetchall()
-    if(len(alldata)==0):
-        return  render_template("admin1.html",flag=0,msg=str(date)+" Date Haven't used Our website")
-    newlist=[]
-    dates=[]
-    list1=[]
-    for data1 in range(len(alldata)):
-        print(list(alldata[data1][5].split(",")))
-        list1.append( list(alldata[data1][5].split(",")) )
-    for i1,i2 in zip(alldata,list1):
-        print("---------------------------------------------",i2[0][3:-3])
-        print("---------------------------------------------",i2[1][3:-3])
-        print("---------------------------------------------",i2[2][3:-3])
-        print("---------------------------------------------",i2[3][3:-3])
-        print("---------------------------------------------",i2[4][3:-3])
-        print("---------------------------------------------",i2[5][3:-3])
-        i2[0]=i2[0][3:-3]
-        i2[1]=i2[1][3:-3]
-        i2[2]=i2[2][3:-3]
-        i2[3]=i2[3][3:-3]
-        i2[4]=i2[4][3:-3]
-        i2[5]=i2[5][3:-3]
-        newlist.append([i1,i2])
-    print("---------------------------------------------------------------------------------------------------------")
-    print(dates)
-    # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
-    return render_template("admin1.html",flag=1,alldata=newlist,dates=dates,length1=range(len(newlist[0][1])))
+    if "data" in client:
+        db = client["data"]
+    else:
+        db = client.create_database("data")
 
+    result = Result(db.all_docs, include_docs=True)
+
+    for i in list(result):
+        if i['doc']['dateurl']==dateurl:
+            i1=i['doc']
+    print(i1)
+    return render_template("admin1.html",flag=1,alldata=i1)
 
 
 @app.route('/adminh2/<email11>',methods=["POST","GET"])
 def adminh2(email11):
     msg=""
-    engine = create_engine('sqlite:///database2.db',echo=True)
-    conn  =engine.connect()
-    res11 = conn.execute("SELECT * FROM data WHERE email =?",(email11))
-    alldata = res11.fetchall()
-    if(len(alldata)==0):
-        return  render_template("admin1.html",flag=0,msg=str(session["email"])+" Email Address Haven't used Our website for  image")
-    newlist=[]
+
+    if "data" in client:
+        db = client["data"]
+    else:
+        db = client.create_database("data")
+    result = Result(db.all_docs, include_docs=True)
     dates=[]
     dupdate=[]
-    list1=[]
-    for data1 in range(len(alldata)):
-        print(list(alldata[data1][5].split(",")))
-        list1.append( list(alldata[data1][5].split(",")) )
-    for i1,i2 in zip(alldata,list1):
-        print("---------------------------------------------",i2[0][3:-3])
-        print("---------------------------------------------",i2[1][3:-3])
-        print("---------------------------------------------",i2[2][3:-3])
-        print("---------------------------------------------",i2[3][3:-3])
-        print("---------------------------------------------",i2[4][3:-3])
-        print("---------------------------------------------",i2[5][3:-3])
-        i2[0]=i2[0][3:-3]
-        i2[1]=i2[1][3:-3]
-        i2[2]=i2[2][3:-3]
-        i2[3]=i2[3][3:-3]
-        i2[4]=i2[4][3:-3]
-        i2[5]=i2[5][3:-3]
-        newlist.append([i1,i2])
-    print("---------------------------------------------------------------------------------------------------------")
-    for i in newlist:
-        if(i[0][6] not in dates):
-            dates.append(i[0][6])
-            dupdate.append(i[0][7])
-        print(i)
-    print(dates)
-    # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
-    return render_template("adminh2.html",flag=1,alldata=newlist,dates=dates,dupdate=dupdate,length1=range(len(dates)))
+    for i in list(result):
+        if i['doc']['email']==email11 and  i['doc']['date'] not in dates:
+            dates.append(i['doc']['date'])
+            dupdate.append(i['doc']['dateurl'])
+    return render_template("adminh2.html",flag=1,dates=dates,dupdate=dupdate,length1=range(len(dates)))
 
 
 @app.route('/admin11',methods=["POST","GET"])
 def admin11():
     msg=""
-    newlist=[]
+    emails=[]
     try:
-        engine = create_engine('sqlite:///database2.db',echo=True)
-        conn  =engine.connect()
-        res11 = conn.execute("SELECT * FROM data")
-        alldata = res11.fetchall()
-        list1=[]
-        emails=[]
-        for data1 in range(len(alldata)):
-            print(list(alldata[data1][5].split(",")))
-            list1.append( list(alldata[data1][5].split(",")) )
-        for i1,i2 in zip(alldata,list1):
-            print("---------------------------------------------",i2[0][3:-3])
-            print("---------------------------------------------",i2[1][3:-3])
-            print("---------------------------------------------",i2[2][3:-3])
-            print("---------------------------------------------",i2[3][3:-3])
-            print("---------------------------------------------",i2[4][3:-3])
-            print("---------------------------------------------",i2[5][3:-3])
-            i2[0]=i2[0][3:-3]
-            i2[1]=i2[1][3:-3]
-            i2[2]=i2[2][3:-3]
-            i2[3]=i2[3][3:-3]
-            i2[4]=i2[4][3:-3]
-            i2[5]=i2[5][3:-3]
-
-            newlist.append([i1,i2])
-        print("---------------------------------------------------------------------------------------------------------")
-        # for i in newlist:
-        #     print(i)
-        # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
+        if "data" in client:
+            db = client["data"]
+        else:
+            db = client.create_database("data")
+        result = Result(db.all_docs, include_docs=True)
+        for i in list(result):
+            if i['doc']['email'] not in emails:
+                emails.append(i['doc']['email'])
     except:
-        # print("exception")
         msgs = "An Exception Occured"
         return render_template("admin.html",msgs=msgs)
-    for i in newlist:
-        if(i[0][1] not in emails):
-            emails.append(i[0][1])
-        print(i)
-    print(emails)
-    return render_template("adminh.html",flag=1,alldata=newlist,emails=emails,length1=range(len(newlist[0][1])))
-
-
-
-
+    return render_template("adminh.html",flag=1,emails=emails)
 
 @app.route('/admin1',methods=["POST","GET"])
 def admin1():
@@ -1074,48 +913,25 @@ def admin1():
         pass1=request.form['password']
         if(str(email1)=="root@gmail.com" and str(pass1)=="root"):
             try:
-                engine = create_engine('sqlite:///database2.db',echo=True)
-                conn  =engine.connect()
-                res11 = conn.execute("SELECT * FROM data")
-                alldata = res11.fetchall()
-                list1=[]
+                if "data" in client:
+                    db = client["data"]
+                else:
+                    db = client.create_database("data")
+                result = Result(db.all_docs, include_docs=True)
+                # print(result,list(result))
                 emails=[]
-                for data1 in range(len(alldata)):
-                    print(list(alldata[data1][5].split(",")))
-                    list1.append( list(alldata[data1][5].split(",")) )
-                for i1,i2 in zip(alldata,list1):
-                    print("---------------------------------------------",i2[0][3:-3])
-                    print("---------------------------------------------",i2[1][3:-3])
-                    print("---------------------------------------------",i2[2][3:-3])
-                    print("---------------------------------------------",i2[3][3:-3])
-                    print("---------------------------------------------",i2[4][3:-3])
-                    print("---------------------------------------------",i2[5][3:-3])
-                    i2[0]=i2[0][3:-3]
-                    i2[1]=i2[1][3:-3]
-                    i2[2]=i2[2][3:-3]
-                    i2[3]=i2[3][3:-3]
-                    i2[4]=i2[4][3:-3]
-                    i2[5]=i2[5][3:-3]
-
-                    newlist.append([i1,i2])
-                print("---------------------------------------------------------------------------------------------------------")
-                # for i in newlist:
-                #     print(i)
-                # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
+                for i in list(result):
+                    if i['doc']['email'] not in emails:
+                        emails.append(i['doc']['email'])
+         
             except:
-                # print("exception")
                 msgs = "An Exception Occured"
                 return render_template("admin.html",msgs=msgs)
         else:
             msgs="Wrong Credentials"
             print(msgs)
             return render_template("admin.html",msgs=msgs)
-        for i in newlist:
-            if(i[0][1] not in emails):
-                emails.append(i[0][1])
-            print(i)
-        print(emails)
-    return render_template("adminh.html",flag=1,alldata=newlist,emails=emails,length1=range(len(newlist[0][1])))
+    return render_template("adminh.html",flag=1,emails=emails)
 
 @app.route('/admin2',methods=["POST","GET"])
 def admin2():
@@ -1127,36 +943,6 @@ def admin22():
     msg=""
     if request.method == 'POST':
         email1=request.form['email']
-        engine = create_engine('sqlite:///database2.db',echo=True)
-        conn  =engine.connect()
-        res11 = conn.execute("SELECT * FROM data WHERE email =?",(str(email1)))
-        alldata = res11.fetchall()
-        if(len(alldata)==0):
-            return  render_template("admin1.html",flag=0,msg=str(email1)+" Email Address Haven't used Our website for  image")
-        newlist=[]
-        list1=[]
-        for data1 in range(len(alldata)):
-            print(list(alldata[data1][5].split(",")))
-            list1.append( list(alldata[data1][5].split(",")) )
-        for i1,i2 in zip(alldata,list1):
-            print("---------------------------------------------",i2[0][3:-3])
-            print("---------------------------------------------",i2[1][3:-3])
-            print("---------------------------------------------",i2[2][3:-3])
-            print("---------------------------------------------",i2[3][3:-3])
-            print("---------------------------------------------",i2[4][3:-3])
-            print("---------------------------------------------",i2[5][3:-3])
-            i2[0]=i2[0][3:-3]
-            i2[1]=i2[1][3:-3]
-            i2[2]=i2[2][3:-3]
-            i2[3]=i2[3][3:-3]
-            i2[4]=i2[4][3:-3]
-            i2[5]=i2[5][3:-3]
-
-            newlist.append([i1,i2])
-        print("---------------------------------------------------------------------------------------------------------")
-        for i in newlist:
-            print(i)
-        # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
     return render_template("admin1.html",flag=1,alldata=newlist,length1=range(len(newlist[0][1])))
 
 
@@ -1189,9 +975,6 @@ def admin3():
         i2[5]=i2[5][3:-3]
 
         newlist.append([i1,i2])
-    # print("---------------------------------------------------------------------------------------------------------")
-
-    # print(alldata[0][0],alldata[0][1],alldata[0][2],alldata[0][3],alldata[0][4])#id , email , input , output1 , output2 , info.
     return render_template("admin1.html",flag=1,alldata=newlist,length1=range(len(newlist[0][1])))
 
 
