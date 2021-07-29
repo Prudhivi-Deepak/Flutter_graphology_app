@@ -195,8 +195,8 @@ def canvas1():
     info=[]
     import os
     flag,user,email = isLoggedIN()
-
-
+    new_name1=""
+    new_name2=""
     if request.method=='POST' and flag:
         image = request.form["image1"]
         my_path = os.path.dirname(__file__)
@@ -526,6 +526,8 @@ def canvas1():
 def main():
     info=[]
     flag,user,email = isLoggedIN()
+    new_name1=""
+    new_name2=""
     if request.method=='POST' and flag:
         f = request.files['image']
         f.save(secure_filename(f.filename))
